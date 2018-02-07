@@ -4,6 +4,19 @@ require 'googleauth/stores/file_token_store'
 
 require 'fileutils'
 
+# require 'yelp'
+
+# Yelp.client.configure do |config|
+#   config.consumer_key = "3qFjFjxfKq8sR9sHRSXdWNrMpTewyxKqSBq1Otu2qlKdlbAHqMBGHYMgi2S7YYQ2lLaBFfDZhew_fFS4FgOJDQeaaLYKrDDxDwOjMzg56wIqKhAcjeLWmp63_f1tWnYx"
+#   config.consumer_secret = YOUR_CONSUMER_SECRET
+#   config.token = YOUR_TOKEN
+#   config.token_secret = YOUR_TOKEN_SECRET
+# end
+
+# Yelp.client.search('San Francisco', { term: 'food' })
+                          
+#   GET https://api.yelp.com/v3/businesses/search
+
 OOB_URI = 'urn:ietf:wg:oauth:2.0:oob'
 APPLICATION_NAME = 'Google Calendar API Ruby Quickstart'
 CLIENT_SECRETS_PATH = 'client_secret.json'
@@ -63,22 +76,31 @@ response = service.list_events(calendar_id,
 @lunch_boolean = false
 
 response.items.each do |event|
+    # puts event #=> #<Google::Apis::CalendarV3::Event:0x000000016000a8>
     if event.summary.include?('lunch') || event.summary.include?('Lunch')
         @lunch_boolean = true 
+        puts "Event summary: " + event.summary
+        puts "Event location: " + event.location
+        puts "Event date and time: " + event.created.iso8601
+        puts event.creator.email
+        puts event.start #=> #<Google::Apis::CalendarV3::EventDateTime:0x0000000238d950>
+        # puts event.start.dateTime
+        puts "Enjoy your lunch"
     end
 end
 
 puts @lunch_boolean
 
 if @lunch_boolean == false
-    puts "Would you like to plan for lunch?"
-    user_input = gets.chomp
-    if user_input == "yes"
-        puts "function for planning lunch"
+    puts "Do you want to order lunch?"
+    client_response = gets.chomp
+    if client_response == "yes"
+        puts "Ordering lunch"
     else
         puts "Okay, but don't starve yourself"
     end
 end
+
     
 
 
