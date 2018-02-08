@@ -22,7 +22,7 @@ APPLICATION_NAME = 'Google Calendar API Ruby Quickstart'
 CLIENT_SECRETS_PATH = 'client_secret.json'
 CREDENTIALS_PATH = File.join(Dir.home, '.credentials',
                              "calendar-ruby-quickstart.yaml")
-SCOPE = Google::Apis::CalendarV3::AUTH_CALENDAR_READONLY
+SCOPE = Google::Apis::CalendarV3::AUTH_CALENDAR
 
 ##
 # Ensure valid credentials, either by restoring from the saved credentials
@@ -79,27 +79,111 @@ response.items.each do |event|
     # puts event #=> #<Google::Apis::CalendarV3::Event:0x000000016000a8>
     if event.summary.include?('lunch') || event.summary.include?('Lunch')
         @lunch_boolean = true 
-        puts "Event summary: " + event.summary
-        puts "Event location: " + event.location
-        puts "Event date and time: " + event.created.iso8601
-        puts event.creator.email
-        puts event.start #=> #<Google::Apis::CalendarV3::EventDateTime:0x0000000238d950>
-        # puts event.start.dateTime
-        puts "Enjoy your lunch"
+        #if lunch is planned, give me a summary
+        event_array = [event.summary, event.location, event.start.date_time.strftime]
+        
+        puts "Lunch is already planned for today.."
+        
+        event_array.each do |var|
+            if var != nil
+                puts var
+            end
+        end
+
     end
 end
 
-puts @lunch_boolean
+puts "lunch boolean is: " + @lunch_boolean.to_s
+
+puts d = DateTime.now
+puts year = d.year
+puts month = d.month
+puts day = d.day
+
 
 if @lunch_boolean == false
     puts "Do you want to order lunch?"
     client_response = gets.chomp
     if client_response == "yes"
-        puts "Ordering lunch"
+        if d.hour >= 11 && d.hour <= 14 
+        	puts "it is lunch time right now"
+        	next_lunch_start = DateTime.new(year,month,day,11,0,0,'-8')
+        	next_lunch_end = DateTime.new(year,month,day,13,0,0,'-8')
+        	
+        	  event = Google::Apis::CalendarV3::Event.new({
+              summary: 'API Created Lunch',
+              location: '1615 S. Diamond Bar BLVD, Diamond Bar, CA 91765',
+              description: 'lunch at home.',
+              start: {
+                date_time: next_lunch_start,
+                time_zone: 'America/Los_Angeles',
+              },
+              end: {
+                date_time: next_lunch_end,
+                time_zone: 'America/Los_Angeles',
+              }
+            })
+            
+            result = service.insert_event('primary', event)
+            puts "Event created: #{result.html_link}"
+                    	
+        	
+        elsif d.hour < 11
+        	puts "it is before lunchtime" 
+        	
+        	next_lunch_start = DateTime.new(year,month,day,11,0,0,'-8')
+        	next_lunch_end = DateTime.new(year,month,day,13,0,0,'-8')
+        	
+        	  event = Google::Apis::CalendarV3::Event.new({
+              summary: 'API Created Lunch',
+              location: '1615 S. Diamond Bar BLVD, Diamond Bar, CA 91765',
+              description: 'lunch at home.',
+              start: {
+                date_time: next_lunch_start,
+                time_zone: 'America/Los_Angeles',
+              },
+              end: {
+                date_time: next_lunch_end,
+                time_zone: 'America/Los_Angeles',
+              }
+            })
+            
+            result = service.insert_event('primary', event)
+            puts "Event created: #{result.html_link}"
+        	
+        	
+        
+        else
+        	puts "next lunchtime is tomorrow"
+        	
+        	next_lunch_start = DateTime.new(year,month,day+1,11,0,0,'-8')
+        	next_lunch_end = DateTime.new(year,month,day+1,13,0,0,'-8')
+        	
+        	  event = Google::Apis::CalendarV3::Event.new({
+              summary: 'API Created Lunch',
+              location: '1615 S. Diamond Bar BLVD, Diamond Bar, CA 91765',
+              description: 'lunch at home.',
+              start: {
+                date_time: next_lunch_start,
+                time_zone: 'America/Los_Angeles',
+              },
+              end: {
+                date_time: next_lunch_end,
+                time_zone: 'America/Los_Angeles',
+              }
+            })
+            
+            result = service.insert_event('primary', event)
+            puts "Event created: #{result.html_link}"
+
+        
+        end
     else
         puts "Okay, but don't starve yourself"
     end
 end
+
+
 
     
 
@@ -129,3 +213,22 @@ end
 
 
 
+#         	event = Google::Apis::CalendarV3::Event.new({
+#               summary: 'API Created Lunch',
+#               location: '1615 S. Diamond Bar BLVD, Diamond Bar, CA 91765',
+#               description: 'lunch at home.',
+#               start: {
+#                 date_time: '2018-02-09T11:00:00-08:00',
+#                 time_zone: 'America/Los_Angeles',
+#               },
+#               end: {
+#                 date_time: '2018-02-09T13:00:00-08:00',
+#                 time_zone: 'America/Los_Angeles',
+#               }
+#             })
+            
+            
+
+
+# result = service.insert_event('primary', event)
+# puts "Event created: #{result.html_link}"
