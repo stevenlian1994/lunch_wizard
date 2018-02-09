@@ -4,6 +4,16 @@ require 'googleauth/stores/file_token_store'
 
 require 'fileutils'
 
+  puts @d = DateTime.now
+  puts @year = @d.year
+  puts @month = @d.month
+  puts @day = @d.day
+  
+
+
+
+
+
 # require 'yelp'
 
 # Yelp.client.configure do |config|
@@ -93,93 +103,56 @@ response.items.each do |event|
     end
 end
 
+def create_lunch_event(lunch_date,service)
+  
+
+  if lunch_date == "today"
+    next_lunch_start = DateTime.new(@year,@month,@day,11,0,0,'-8')
+    next_lunch_end = DateTime.new(@year,@month,@day,13,0,0,'-8')
+  else
+    next_lunch_start = DateTime.new(@year,@month,@day+1,11,0,0,'-8')
+    next_lunch_end = DateTime.new(@year,@month,@day+1,13,0,0,'-8')
+  end
+        	
+  event = Google::Apis::CalendarV3::Event.new({
+    summary: 'API Created Lunch',
+    location: '1615 S. Diamond Bar BLVD, Diamond Bar, CA 91765',
+    description: 'lunch at home.',
+    start: {
+      date_time: next_lunch_start,
+      time_zone: 'America/Los_Angeles',
+    },
+    end: {
+      date_time: next_lunch_end,
+      time_zone: 'America/Los_Angeles',
+    }
+  })
+            
+    result = service.insert_event('primary', event)
+    puts "Event created: #{result.html_link}"
+  
+end
+
 puts "lunch boolean is: " + @lunch_boolean.to_s
 
-puts d = DateTime.now
-puts year = d.year
-puts month = d.month
-puts day = d.day
+
+
+
 
 
 if @lunch_boolean == false
     puts "Do you want to order lunch?"
     client_response = gets.chomp
     if client_response == "yes"
-        if d.hour >= 11 && d.hour <= 14 
-        	puts "it is lunch time right now"
-        	next_lunch_start = DateTime.new(year,month,day,11,0,0,'-8')
-        	next_lunch_end = DateTime.new(year,month,day,13,0,0,'-8')
-        	
-        	  event = Google::Apis::CalendarV3::Event.new({
-              summary: 'API Created Lunch',
-              location: '1615 S. Diamond Bar BLVD, Diamond Bar, CA 91765',
-              description: 'lunch at home.',
-              start: {
-                date_time: next_lunch_start,
-                time_zone: 'America/Los_Angeles',
-              },
-              end: {
-                date_time: next_lunch_end,
-                time_zone: 'America/Los_Angeles',
-              }
-            })
-            
-            result = service.insert_event('primary', event)
-            puts "Event created: #{result.html_link}"
-                    	
-        	
-        elsif d.hour < 11
-        	puts "it is before lunchtime" 
-        	
-        	next_lunch_start = DateTime.new(year,month,day,11,0,0,'-8')
-        	next_lunch_end = DateTime.new(year,month,day,13,0,0,'-8')
-        	
-        	  event = Google::Apis::CalendarV3::Event.new({
-              summary: 'API Created Lunch',
-              location: '1615 S. Diamond Bar BLVD, Diamond Bar, CA 91765',
-              description: 'lunch at home.',
-              start: {
-                date_time: next_lunch_start,
-                time_zone: 'America/Los_Angeles',
-              },
-              end: {
-                date_time: next_lunch_end,
-                time_zone: 'America/Los_Angeles',
-              }
-            })
-            
-            result = service.insert_event('primary', event)
-            puts "Event created: #{result.html_link}"
-        	
-        	
-        
+        if @d.hour <= 14 
+          create_lunch_event("today",service)
+	
         else
-        	puts "next lunchtime is tomorrow"
+        	create_lunch_event("tomorrow",service)
         	
-        	next_lunch_start = DateTime.new(year,month,day+1,11,0,0,'-8')
-        	next_lunch_end = DateTime.new(year,month,day+1,13,0,0,'-8')
-        	
-        	  event = Google::Apis::CalendarV3::Event.new({
-              summary: 'API Created Lunch',
-              location: '1615 S. Diamond Bar BLVD, Diamond Bar, CA 91765',
-              description: 'lunch at home.',
-              start: {
-                date_time: next_lunch_start,
-                time_zone: 'America/Los_Angeles',
-              },
-              end: {
-                date_time: next_lunch_end,
-                time_zone: 'America/Los_Angeles',
-              }
-            })
-            
-            result = service.insert_event('primary', event)
-            puts "Event created: #{result.html_link}"
-
-        
         end
     else
-        puts "Okay, but don't starve yourself"
+        puts "Okay, no lunch ordered"
     end
 end
 
