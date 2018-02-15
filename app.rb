@@ -5,8 +5,8 @@ require 'googleauth/stores/file_token_store'
 require 'fileutils'
 
   puts @d = DateTime.now
-  puts @year = @d.year
-  puts @month = @d.month
+  @year = @d.year
+  @month = @d.month
   puts @day = @d.day
   
 
@@ -84,7 +84,7 @@ response = service.list_events(calendar_id,
 #<Google::Apis::CalendarV3::Event:0x00000002dfd4f8>
 #<Google::Apis::CalendarV3::Event:0x00000002d444f8>
 @lunch_boolean = false
-
+puts "Checking the events for the next 24 hours..."
 response.items.each do |event|
     # puts event #=> #<Google::Apis::CalendarV3::Event:0x000000016000a8>
     if event.summary.include?('lunch') || event.summary.include?('Lunch')
@@ -96,12 +96,32 @@ response.items.each do |event|
         
         event_array.each do |var|
             if var != nil
-                puts var
+                var
             end
         end
 
     end
 end
+
+@before_checker = 0
+@after_checker = 0
+  response.items.each do |event|
+    a = 12
+    event_array = [event.summary, event.location, event.start.date_time.strftime]
+    b = event.start.date_time.hour-12
+    event_array << b
+    print event_array
+    puts
+    if @before_checker == 0
+      @before_checker = event_array.last
+    elsif @before_checker < event_array.last
+      @before_checker = event_array.last
+    end
+    puts @before_checker
+    
+  
+    # if event_array.last 
+  #HAVING TROUBLE PUTTING RESPONSE IN A METHOD .. find_event_before_lunch': undefined local variable or method `response' for main:Object (NameError)
 
 def create_lunch_event(lunch_date,service)
   
@@ -133,6 +153,11 @@ def create_lunch_event(lunch_date,service)
   
 end
 
+def location_pinpoint(location_before,location_after)
+  
+
+end
+
 puts "lunch boolean is: " + @lunch_boolean.to_s
 
 
@@ -143,6 +168,9 @@ puts "lunch boolean is: " + @lunch_boolean.to_s
 if @lunch_boolean == false
     puts "Do you want to order lunch?"
     client_response = gets.chomp
+    #set 1 or 2 known locations around lunch as location_before and location_after, and assign them as arguments to location_pinpoint method
+    
+    
     if client_response == "yes"
         if @d.hour <= 14 
           create_lunch_event("today",service)
