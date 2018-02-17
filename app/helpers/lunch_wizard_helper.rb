@@ -1,0 +1,2 @@
+module LunchWizardHelper
+end
